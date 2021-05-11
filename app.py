@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 import os
 
+import aws_cdk.aws_s3 as s3
 from aws_cdk import core as cdk
+from aws_cdk.core import App, Construct
 
 # For consistency with TypeScript code, `cdk` is the preferred import name for
 # the CDK's core module.  The following line also imports it as `core` for use
