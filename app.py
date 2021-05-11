@@ -4,6 +4,8 @@ import os
 import aws_cdk.aws_s3 as s3
 from aws_cdk import core as cdk
 from aws_cdk.core import App, Construct
+from aws_cdk import aws_iam as iam
+
 
 # For consistency with TypeScript code, `cdk` is the preferred import name for
 # the CDK's core module.  The following line also imports it as `core` for use
@@ -11,26 +13,19 @@ from aws_cdk.core import App, Construct
 # being updated to use `cdk`.  You may delete this import if you don't need it.
 from aws_cdk import core
 
-from aws_cdk_test.aws_cdk_test_stack import AwsCdkTestStack
 
+class S3Bucket:
+    def __init__(self, id:str, app: App, **kwargs) -> None:
+        super().__init__(app, id)
+        myBucket = s3.Bucket(self, 'MyFirstBucket', bucket_name='balkaran-aws-cdk-s3-demo-bucket')
+        myBucket.add_to_resource_policy(    #Grant read access to everyone in your account
+            iam.PolicyStatement(
+                    actions=['s3:GetObject'],
+                    resources=[myBucket.arn_for_objects('*')],
+                    principals=[iam.AccountPrincipal(account_id=core.Aws.ACCOUNT_ID)]
+            )
+        )
 
-app = core.App()
-AwsCdkTestStack(app, "AwsCdkTestStack",
-    # If you don't specify 'env', this stack will be environment-agnostic.
-    # Account/Region-dependent features and context lookups will not work,
-    # but a single synthesized template can be deployed anywhere.
-
-    # Uncomment the next line to specialize this stack for the AWS Account
-    # and Region that are implied by the current CLI configuration.
-
-    #env=core.Environment(account=os.getenv('CDK_DEFAULT_ACCOUNT'), region=os.getenv('CDK_DEFAULT_REGION')),
-
-    # Uncomment the next line if you know exactly what Account and Region you
-    # want to deploy the stack to. */
-
-    #env=core.Environment(account='123456789012', region='us-east-1'),
-
-    # For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html
-    )
-
+app = App()
+S3Bucket(app, "S3Bucket")
 app.synth()
